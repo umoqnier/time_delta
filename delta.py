@@ -1,8 +1,8 @@
-from datetime import datetime
-
-
 def get_years_diff(first_year, last_year):
-    return abs(first_year - last_year) * 365
+    if first_year == last_year:
+        return 0
+    else:
+        return (abs(first_year - last_year) - 1) * 365
 
 
 def get_months_diff(first_month, last_month):
@@ -15,39 +15,49 @@ def get_months_diff(first_month, last_month):
 
 
 def get_days_diff(first_day, last_day):
-    days = {'Mon': 1, 'Tue': 2, 'Wed': 3, 'Thu': 4, 'Fri': 5, 'Sat': 6, 'Sun': 7}
-    return abs(first_day - last_day)
+    return abs(int(first_day) - int(last_day))
 
 
 def get_hours_diff(first_hour, last_hour):
     hour_1 = first_hour.split(":")
     hour_2 = last_hour.split(":")
     return abs(int(hour_1[0]) - int(hour_2[0])) + abs((int(hour_1[1]) - int(hour_2[1])) / 60) \
-           + abs((int(hour_1[3]) - int(hour_2[3])) / 3600)
+           + abs((int(hour_1[2]) - int(hour_2[2])) / 3600)
 
 
 def get_time_zone_diff(first_time, last_time):
-    return abs(int(first_time[1]) - int(last_time[1])) * 10 + abs(int(first_time[2]) - int(last_time[2])) \
-           + abs(int(first_time[3:]) - int(last_time[3:]) / 60)
+    if first_time[0] != last_time[0]:
+        return abs(int(first_time[1]) + int(last_time[1])) * 10 + abs(int(first_time[2]) + int(last_time[2])) \
+           + abs(int(first_time[3:]) + int(last_time[3:])) / 60
+    else:
+        return abs(int(first_time[1]) - int(last_time[1])) * 10 + abs(int(first_time[2]) - int(last_time[2])) \
+           + abs(int(first_time[3:]) - int(last_time[3:])) / 60
 
 
 def get_total_diff(first_ts, last_ts):
     date_1 = first_ts.split(" ")
     date_2 = last_ts.split(" ")
-    days = get_days_diff(date_1[0], date_2[0])
-    months = get_months_diff(date_1[1], date_2[1])
+    days = get_days_diff(date_1[1], date_2[1])
+    months = get_months_diff(date_1[2], date_2[2])
     years = get_years_diff(date_1[3], date_2[3])
     hours = get_hours_diff(date_1[4], date_2[4])
     total_days = days + months + years
-    total_hours = (total_days * 24) + hours
-    return total_hours * 3600
+    time_z = get_time_zone_diff(date_1[5], date_2[5])
+    total_hours = (total_days * 24) + hours - time_z
+    return abs(int(total_hours * 3600))
 
 
 def main():
-    ts_1 = input("1: ")
-    ts_2 = input("2: ")
-    get_total_diff(ts_1, ts_2)
+    results = []
+    cases = int(input())
+    while cases != 0:
+        ts_1 = input()
+        ts_2 = input()
+        results.append(get_total_diff(ts_1, ts_2))
+        cases -= 1
 
+    for result in results:
+        print(result)
 
 if __name__ == '__main__':
     main()
